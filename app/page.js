@@ -6,7 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: `Hello I am your AI Assistant. Give me a YouTube URL and a question and I will generate a response for you.`,
+      content: `Hello I am your AI Assistant. Select a youtube video and ask me a question.`,
     }
   ]);
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -74,14 +74,24 @@ export default function Home() {
       });
     }
   }
-
   const resetVideo = async () => {
     setisVideo(false)
     setYoutubeUrl('')
     setMessages([
-      { role: 'assistant', content: `Enter a new video.` }
+      { role: 'assistant', content: `Select a new video.` }
     ])
   }
+
+  // YouTube links
+  const youtubeLinks = [
+    { url: "https://youtu.be/5x_NRqnMVJU?si=bSMD0BnKg5snK-om", label: "Worth It? Eating and Rating TikTok's Most VIRAL NYC Foods 2024 (14 spots)" },
+    { url: "https://www.youtube.com/watch?v=iAI4a0tU_do", label: "TOP 10 Things to do in MEXICO CITY - [CDMX Travel Guide]" },
+    { url: "https://youtu.be/t9xRdKVgOHA?si=tNKF9zPExrOoJyLG", label: "Making a NY-Style Sauce That's ACTUALLY Authentic" }
+  ];
+
+  const handleLinkClick = (url) => {
+    setYoutubeUrl(url);
+  };
 
   return (
     <Box
@@ -92,7 +102,6 @@ export default function Home() {
       justifyContent="center"
       alignItems="center"
     >
-
       <Stack
         width="600px"
         height="800px"
@@ -101,6 +110,15 @@ export default function Home() {
         p={2}
         spacing={2}
       >
+        {!isVideo && (
+          <Stack direction="row" spacing={2} justifyContent="center">
+            {youtubeLinks.map((link, index) => (
+              <Button key={index} variant="outlined" onClick={() => handleLinkClick(link.url)}>
+                {link.label}
+              </Button>
+            ))}
+          </Stack>
+        )}
 
         <Stack
           direction="column"
@@ -109,7 +127,6 @@ export default function Home() {
           overflow="auto"
           maxHeight="100%"
         >
-
           {messages.map((message, index) => (
             <Box
               key={index}
@@ -121,7 +138,7 @@ export default function Home() {
                 color="white"
                 p={3}
                 borderRadius={16}
-                sx={{whiteSpace: "pre-wrap"}}
+                sx={{ whiteSpace: "pre-wrap" }}
               >
                 {message.content}
               </Box>
@@ -130,12 +147,14 @@ export default function Home() {
         </Stack>
 
         <Stack direction="column" spacing={2}>
-          {!isVideo &&(<TextField
-            label="YouTube URL"
-            fullWidth
-            value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
-          />)}
+          {!isVideo && (
+            <TextField
+              label="YouTube URL"
+              fullWidth
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+            />
+          )}
           
           <TextField
             label="Question"
@@ -144,9 +163,9 @@ export default function Home() {
             onChange={(e) => setQuery(e.target.value)}
           />
           <Button variant="contained" onClick={sendMessage}>Send</Button>
-          <Button variant="contained" onClick={resetVideo}>
+          {isVideo && (<Button variant="contained" onClick={resetVideo}>
             Reset Video
-          </Button>
+          </Button>)}
         </Stack>
       </Stack>
     </Box>
