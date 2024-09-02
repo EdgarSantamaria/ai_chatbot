@@ -1,6 +1,7 @@
 'use client'
 import { Box, Stack, TextField, Button } from "@mui/material";
 import { useState } from "react";
+import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -26,45 +27,30 @@ export default function Home() {
     console.log("Sending Query:", query);
     
     try {
-      const response = await fetch('https://api-rag-five.vercel.app/perform_rag', {
+      const response = await fetch('https://youtube-chatbot.vercel.app/perform_rag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ youtube_url: youtubeUrl, query: query }),
-      });
-  
-      if (!response.body) {
-        throw new Error('No response body');
-      }
-  
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let result = '';
-  
-      const processText = async ({ done, value }) => {
-        if (done) {
-          return result;
-        }
-  
-        const text = decoder.decode(value || new Int8Array(), { stream: true });
-        result += text;
-  
-        setMessages((messages) => {
-          const lastMessage = messages[messages.length - 1];
-          const otherMessages = messages.slice(0, messages.length - 1);
-          return [
-            ...otherMessages,
-            {
-              ...lastMessage,
-              content: lastMessage.content + text,
-            },
-          ];
-        });
-  
-        return reader.read().then(processText);
-      };
-  
-      await reader.read().then(processText);
-  
+      }).then(async(res) => {
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let result = ''
+        return reader.read().then(function processText({done, value}){
+          if (done){
+            return result
+          }
+          const text = decoder.decode(value || new Uint8Array(), {stream:true})
+          setMessages((messages)=>{
+            let lastMessage = messages[messages.length -1]
+            let otherMessages = messages.slice(0, messages.length-1)
+            return[
+              ...otherMessages,
+              {...lastMessage, content:lastMessage.content + text}
+            ]
+          })
+          return reader.read().then(processText)
+        })
+      })
     } catch (error) {
       console.error('Error:', error);
       setMessages((messages) => {
@@ -140,7 +126,7 @@ export default function Home() {
                 borderRadius={16}
                 sx={{ whiteSpace: "pre-wrap" }}
               >
-                {message.content}
+                <ReactMarkdown>{message.content}</ReactMarkdown>
               </Box>
             </Box>
           ))}
