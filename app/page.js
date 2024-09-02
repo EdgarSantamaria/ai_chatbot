@@ -27,7 +27,7 @@ export default function Home() {
     console.log("Sending Query:", query);
     
     try {
-      const response = await fetch('https://youtube-chatbot.vercel.app/perform_rag', {
+      const response = await fetch('https://api-rag-five.vercel.app/perform_rag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ youtube_url: youtubeUrl, query: query }),
